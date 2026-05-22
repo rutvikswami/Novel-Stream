@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novel Stream - Audiobook Generator</title>
+    <!-- Tailwind CSS for sleek utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Modern font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for cool media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#00f0ff', /* Vibrant Cyber Blue */
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                            950: '#083344',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030712;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.07) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 119, 255, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.2);
+            border-radius: 9999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.5);
+        }
+
+        /* Smooth inputs focus ring glow */
+        .neon-focus:focus {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+            border-color: #00f0ff !important;
+        }
+
+        /* Custom styling for speed range track */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00f0ff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body class="font-sans text-slate-100 min-h-screen py-10 px-4 flex justify-center items-start">
+
+    <div
+        class="w-full max-w-3xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyan-950/20">
+
+        <!-- Header Section -->
+        <header class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-800/80">
+            <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-headphones-simple text-xl"></i>
+            </div>
+            <div>
+                <h1
+                    class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-cyber-400 bg-clip-text text-transparent">
+                    Novel Stream
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">High-Fidelity Audiobook Generation Engine</p>
+            </div>
+        </header>
+
+        <!-- Controls & Input Form -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Base Novel
+                    URL</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                        <i class="fa-solid fa-link text-sm"></i>
+                    </span>
+                    <input id="base_url" type="text" placeholder="https://novelarchive.com/source-book"
+                        class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                        Current Chapter
+                    </label>
+
+                    <div class="relative">
+
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-book-open text-xs"></i>
+                        </span>
+
+                        <input id="current_chapter" type="number" placeholder="e.g. 120"
+                            class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Start
+                        Chapter</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-play text-xs"></i>
+                        </span>
+                        <input id="start" type="number" placeholder="e.g. 1"
+                            class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">End
+                        Chapter</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-flag-checkered text-xs"></i>
+                        </span>
+                        <input id="end" type="number" placeholder="e.g. 10"
+                            class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="createJob()"
+                class="w-full relative overflow-hidden bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold tracking-wide uppercase text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-play text-base"></i>
+                <span>Start Generation Job</span>
+            </button>
+        </div>
+
+        <!-- Playback Speed Controls -->
+        <div class="mt-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-slate-300">Global Playback Speed</span>
+                <span id="speed_value"
+                    class="font-mono text-xs font-bold text-cyber-400 bg-cyber-500/10 px-2.5 py-1 rounded-md border border-cyber-500/20">1.00x</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-mono text-slate-500">0.25x</span>
+                <input id="speed_control" type="range" min="0.25" max="4" step="0.25" value="1"
+                    oninput="updateGlobalSpeed(this.value)"
+                    class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                <span class="text-[10px] font-mono text-slate-500">4.0x</span>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Job Status</h2>
+        <div id="status"
+            class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl font-mono text-xs text-slate-400 leading-relaxed flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-700 animate-pulse inline-block flex-shrink-0"></span>
+            <span>Awaiting parameters to spin up transcription engine...</span>
+        </div>
+
+        <!-- Playlist Output Section -->
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Generated Chapters</h2>
+        <div id="chapters" class="space-y-4">
+            <!-- Empty state fallback design -->
+            <div id="empty-placeholder" class="border border-dashed border-slate-800 rounded-xl py-12 px-4 text-center">
+                <div
+                    class="w-12 h-12 rounded-full bg-slate-900/80 border border-slate-800 flex items-center justify-center mx-auto text-slate-600 mb-3">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <h4 class="text-sm font-semibold text-slate-400 mb-1">No audio streaming yet</h4>
+                <p class="text-xs text-slate-600 max-w-xs mx-auto">Input a URL and start a generator job. Your generated
+                    audio segments will stream here dynamically.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const renderedChapters = new Set()
+        let currentJobId = null
+        let currentPlaybackSpeed = 1.0
+
+        async function createJob() {
+            const baseUrl = document.getElementById("base_url").value
+            const currentChapter = document.getElementById("current_chapter").value
+            const start = document.getElementById("start").value
+            const end = document.getElementById("end").value
+
+            const response = await fetch(
+                `/create-job?base_url=${encodeURIComponent(baseUrl)}&current_chapter=${currentChapter}&start=${start}&end=${end}`,
+                { method: "POST" }
+            )
+
+            const data = await response.json()
+            currentJobId = data.job_id
+            pollJob()
+        }
+
+        async function pollJob() {
+            if (!currentJobId) return
+
+            const response = await fetch(`/job/${currentJobId}`)
+            const data = await response.json()
+
+            // Update status widget with beautifully formatted layout
+            let statusColor = 'bg-yellow-500 animate-pulse';
+            if (data.status === 'completed') statusColor = 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
+            if (data.status === 'failed') statusColor = 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]';
+
+            document.getElementById("status").innerHTML = `
+                <span class="w-2.5 h-2.5 rounded-full ${statusColor} inline-block flex-shrink-0"></span>
+                <div class="flex-1">
+                    <div class="flex justify-between">
+                        <span>Task Status: <strong class="text-slate-200 uppercase">${data.status}</strong></span>
+                        <span class="text-cyan-400 font-semibold">${data.completed.length} / ${data.total} Chapters Done</span>
+                    </div>
+                </div>
+            `
+
+            const chaptersDiv = document.getElementById("chapters")
+
+            for (const chapter in data.audio_files) {
+                if (renderedChapters.has(chapter)) {
+                    continue
+                }
+
+                renderedChapters.add(chapter)
+                const audioUrl = data.audio_files[chapter]
+
+                // Remove placeholder if active
+                const placeholder = document.getElementById("empty-placeholder")
+                if (placeholder) {
+                    placeholder.remove()
+                }
+
+                // Append safely without disrupting existing active players
+                const chapterHtml = `
+                    <div class="chapter-card bg-slate-950/40 hover:bg-slate-950/60 border border-slate-800/80 p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300" id="card_ch_${chapter}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                                <i class="fa-solid fa-volume-high text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-sm text-slate-100">Chapter ${chapter}</h3>
+                                <p class="text-[10px] text-slate-500 font-medium">MP3 Live Stream</p>
+                            </div>
+                        </div>
+                        <div class="w-full md:max-w-[420px]">
+                            <audio controls class="audio-player w-full bg-slate-900 rounded-lg">
+                                <source src="${audioUrl}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                `
+                chaptersDiv.insertAdjacentHTML('beforeend', chapterHtml)
+
+                // Keep the dynamic playback speed aligned to the slider value
+                const newAudio = chaptersDiv.querySelector(`#card_ch_${chapter} audio`)
+                if (newAudio) {
+                    newAudio.playbackRate = currentPlaybackSpeed
+                }
+            }
+
+            if (data.status !== "completed") {
+                setTimeout(pollJob, 3000)
+            }
+        }
+
+        function updateGlobalSpeed(val) {
+            currentPlaybackSpeed = parseFloat(val)
+            document.getElementById("speed_value").innerText = `${currentPlaybackSpeed.toFixed(2)}x`
+
+            // Adjust speeds across all active players instantly without skipping
+            const players = document.querySelectorAll(".audio-player")
+            players.forEach(player => {
+                player.playbackRate = currentPlaybackSpeed
+            })
+        }
+    </script>
+
+</body>
+
+</html>

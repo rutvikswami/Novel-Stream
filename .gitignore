@@ -1,0 +1,6 @@
+env
+.env
+output
+uploaded_audio
+__pycache__
+*.pyc
