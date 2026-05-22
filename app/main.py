@@ -12,9 +12,6 @@ from fastapi.responses import FileResponse
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-@app.get('/')
-async def home():
-    return {"message": "API Running"}
 
 @app.get('/chapter')
 async def get_chapter(url: str):
@@ -80,7 +77,7 @@ async def get_audio(i: int):
     )
 
 
-@app.get("/player")
+@app.get("/")
 async def player(request: Request):
 
     return templates.TemplateResponse(
