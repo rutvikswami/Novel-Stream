@@ -176,19 +176,36 @@
             </button>
         </div>
 
-        <!-- Playback Speed Controls -->
-        <div class="mt-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-5">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-sm font-semibold text-slate-300">Global Playback Speed</span>
-                <span id="speed_value"
-                    class="font-mono text-xs font-bold text-cyber-400 bg-cyber-500/10 px-2.5 py-1 rounded-md border border-cyber-500/20">1.00x</span>
+        <!-- Playback Controls & Options -->
+        <div class="mt-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-4">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-semibold text-slate-300">Global Playback Speed</span>
+                    <span id="speed_value"
+                        class="font-mono text-xs font-bold text-cyber-400 bg-cyber-500/10 px-2.5 py-1 rounded-md border border-cyber-500/20">1.00x</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-mono text-slate-500">0.25x</span>
+                    <input id="speed_control" type="range" min="0.25" max="4" step="0.25" value="1"
+                        oninput="updateGlobalSpeed(this.value)"
+                        class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                    <span class="text-[10px] font-mono text-slate-500">4.0x</span>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <span class="text-[10px] font-mono text-slate-500">0.25x</span>
-                <input id="speed_control" type="range" min="0.25" max="4" step="0.25" value="1"
-                    oninput="updateGlobalSpeed(this.value)"
-                    class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
-                <span class="text-[10px] font-mono text-slate-500">4.0x</span>
+
+            <!-- Autoplay Option Toggle -->
+            <div class="border-t border-slate-800/60 pt-4 flex items-center justify-between">
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xs text-cyber-400"></i>
+                        Continuous Autoplay
+                    </span>
+                    <span class="text-[10px] text-slate-500">Automatically queue and play the next chapter as it completes or generates</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="autoplay_toggle" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-500 after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyber-500 peer-checked:after:bg-slate-950 peer-checked:after:border-cyber-500"></div>
+                </label>
             </div>
         </div>
 
@@ -220,6 +237,7 @@
         const renderedChapters = new Set()
         let currentJobId = null
         let currentPlaybackSpeed = 1.0
+        let lastFinishedAudio = null
 
         async function createJob() {
             const baseUrl = document.getElementById("base_url").value
@@ -235,6 +253,39 @@
             const data = await response.json()
             currentJobId = data.job_id
             pollJob()
+        }
+
+        function pauseOtherAudios(current) {
+            const players = document.querySelectorAll(".audio-player")
+            players.forEach(player => {
+                if (player !== current && !player.paused) {
+                    player.pause()
+                }
+            })
+        }
+
+        function handleAudioEnded(event) {
+            const autoplayEnabled = document.getElementById("autoplay_toggle").checked
+            if (!autoplayEnabled) return
+
+            const currentAudio = event.target
+            const players = Array.from(document.querySelectorAll(".audio-player"))
+            const currentIndex = players.indexOf(currentAudio)
+
+            if (currentIndex !== -1 && currentIndex < players.length - 1) {
+                const nextPlayer = players[currentIndex + 1]
+                nextPlayer.play().catch(err => {
+                    console.warn("Autoplay playback failed (may require user interaction):", err)
+                })
+                const nextCard = nextPlayer.closest(".chapter-card")
+                if (nextCard) {
+                    nextCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                }
+            } else if (currentIndex === players.length - 1) {
+                // Keep track of the last ended audio so that if a new chapter is dynamically
+                // appended/rendered, we can immediately play it.
+                lastFinishedAudio = currentAudio
+            }
         }
 
         async function pollJob() {
@@ -299,6 +350,33 @@
                 const newAudio = chaptersDiv.querySelector(`#card_ch_${chapter} audio`)
                 if (newAudio) {
                     newAudio.playbackRate = currentPlaybackSpeed
+                    
+                    // Wire up autoplay events and pause coordination
+                    newAudio.addEventListener('ended', handleAudioEnded)
+                    newAudio.addEventListener('play', (e) => {
+                        pauseOtherAudios(e.target)
+                        if (lastFinishedAudio === e.target) {
+                            lastFinishedAudio = null
+                        }
+                    })
+
+                    // Handle autoplay for newly rendered chapters if the last chapter just ended
+                    const autoplayEnabled = document.getElementById("autoplay_toggle").checked
+                    if (autoplayEnabled && lastFinishedAudio) {
+                        const players = Array.from(document.querySelectorAll(".audio-player"))
+                        const prevAudioIndex = players.indexOf(lastFinishedAudio)
+                        const newAudioIndex = players.indexOf(newAudio)
+                        if (newAudioIndex === prevAudioIndex + 1) {
+                            lastFinishedAudio = null
+                            newAudio.play().catch(err => {
+                                console.warn("Autoplay for newly loaded chapter failed:", err)
+                            })
+                            const nextCard = newAudio.closest(".chapter-card")
+                            if (nextCard) {
+                                nextCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                            }
+                        }
+                    }
                 }
             }
 
