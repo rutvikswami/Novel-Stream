@@ -97,138 +97,174 @@
 
 <body class="font-sans text-slate-100 min-h-screen py-10 px-4 flex justify-center items-start">
 
-    <div
-        class="w-full max-w-3xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyan-950/20">
-
-        <!-- Header Section -->
-        <header class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-800/80">
-            <div
-                class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-headphones-simple text-xl"></i>
-            </div>
-            <div>
-                <h1
-                    class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-cyber-400 bg-clip-text text-transparent">
-                    Novel Stream
-                </h1>
-                <p class="text-xs text-slate-400 mt-0.5">High-Fidelity Audiobook Generation Engine</p>
-            </div>
-        </header>
-
-        <!-- Controls & Input Form -->
-        <div class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Base Novel
-                    URL</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                        <i class="fa-solid fa-link text-sm"></i>
-                    </span>
-                    <input id="base_url" type="text" placeholder="https://novelarchive.com/source-book"
-                        class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-6xl">
+        <!-- Left Column: Generator & Live Playlist -->
+        <div class="lg:col-span-7 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyan-950/20 space-y-6">
+            <!-- Header Section -->
+            <header class="flex items-center gap-4 pb-6 border-b border-slate-800/80">
+                <div
+                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-headphones-simple text-xl"></i>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                        Current Chapter
-                    </label>
+                    <h1
+                        class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-cyber-400 bg-clip-text text-transparent">
+                        Novel Stream
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-0.5">High-Fidelity Audiobook Generation Engine</p>
+                </div>
+            </header>
 
+            <!-- Controls & Input Form -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Base Novel
+                        URL</label>
                     <div class="relative">
-
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                            <i class="fa-solid fa-book-open text-xs"></i>
+                            <i class="fa-solid fa-link text-sm"></i>
                         </span>
-
-                        <input id="current_chapter" type="number" placeholder="e.g. 120"
+                        <input id="base_url" type="text" placeholder="https://novelarchive.com/source-book"
                             class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Start
-                        Chapter</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                            <i class="fa-solid fa-play text-xs"></i>
-                        </span>
-                        <input id="start" type="number" placeholder="e.g. 1"
-                            class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            Current Chapter
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                <i class="fa-solid fa-book-open text-xs"></i>
+                            </span>
+                            <input id="current_chapter" type="number" placeholder="e.g. 120"
+                                class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            Start Chapter
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                <i class="fa-solid fa-circle-play text-xs"></i>
+                            </span>
+                            <input id="start" type="number" placeholder="e.g. 120"
+                                class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            End Chapter
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                <i class="fa-solid fa-circle-stop text-xs"></i>
+                            </span>
+                            <input id="end" type="number" placeholder="e.g. 125"
+                                class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">End
-                        Chapter</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                            <i class="fa-solid fa-flag-checkered text-xs"></i>
-                        </span>
-                        <input id="end" type="number" placeholder="e.g. 10"
-                            class="neon-focus w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-600 transition-all">
-                    </div>
-                </div>
+
+                <button onclick="createJob()"
+                    class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold py-3 px-4 rounded-xl shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    Initialize Audio Generation Job
+                </button>
             </div>
 
-            <button onclick="createJob()"
-                class="w-full relative overflow-hidden bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold tracking-wide uppercase text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-circle-play text-base"></i>
-                <span>Start Generation Job</span>
-            </button>
-        </div>
-
-        <!-- Playback Controls & Options -->
-        <div class="mt-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-4">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-semibold text-slate-300">Global Playback Speed</span>
-                    <span id="speed_value"
-                        class="font-mono text-xs font-bold text-cyber-400 bg-cyber-500/10 px-2.5 py-1 rounded-md border border-cyber-500/20">1.00x</span>
+            <!-- Playback Controls & Options -->
+            <div class="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800/60">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high text-cyan-400 text-sm"></i>
+                        <span class="text-sm font-semibold text-slate-300">Global Playback Speed</span>
+                    </div>
+                    <span id="speed_value" class="text-xs font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-2 py-0.5 rounded-md font-semibold">1.00x</span>
                 </div>
+                
                 <div class="flex items-center gap-4">
-                    <span class="text-[10px] font-mono text-slate-500">0.25x</span>
-                    <input id="speed_control" type="range" min="0.25" max="4" step="0.25" value="1"
+                    <span class="text-[10px] font-mono text-slate-500">0.5x</span>
+                    <input type="range" min="0.5" max="4.0" step="0.05" value="1.0"
                         oninput="updateGlobalSpeed(this.value)"
                         class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
                     <span class="text-[10px] font-mono text-slate-500">4.0x</span>
                 </div>
+
+                <!-- Autoplay Option Toggle -->
+                <div class="border-t border-slate-800/60 pt-4 flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xs text-cyber-400"></i>
+                            Continuous Autoplay
+                        </span>
+                        <span class="text-[10px] text-slate-500">Automatically queue and play the next chapter as it completes or generates</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="autoplay_toggle" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-500 after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyber-500 peer-checked:after:bg-slate-950 peer-checked:after:border-cyber-500"></div>
+                    </label>
+                </div>
             </div>
 
-            <!-- Autoplay Option Toggle -->
-            <div class="border-t border-slate-800/60 pt-4 flex items-center justify-between">
-                <div class="flex flex-col">
-                    <span class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles text-xs text-cyber-400"></i>
-                        Continuous Autoplay
-                    </span>
-                    <span class="text-[10px] text-slate-500">Automatically queue and play the next chapter as it completes or generates</span>
+            <!-- Status Panel -->
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Job Status</h2>
+            <div id="status"
+                class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl font-mono text-xs text-slate-400 leading-relaxed flex items-center gap-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-700 animate-pulse inline-block flex-shrink-0"></span>
+                <span>Awaiting parameters to spin up transcription engine...</span>
+            </div>
+
+            <!-- Playlist Output Section -->
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Generated Chapters / Playlist</h2>
+            <div id="chapters" class="space-y-4">
+                <!-- Empty state fallback design -->
+                <div id="empty-placeholder" class="border border-dashed border-slate-800 rounded-xl py-12 px-4 text-center">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-900/80 border border-slate-800 flex items-center justify-center mx-auto text-slate-600 mb-3">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <h4 class="text-sm font-semibold text-slate-400 mb-1">No audio streaming yet</h4>
+                    <p class="text-xs text-slate-600 max-w-xs mx-auto">Input a URL and start a generator job. Your generated
+                        audio segments will stream here dynamically.</p>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="autoplay_toggle" class="sr-only peer" checked>
-                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-500 after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyber-500 peer-checked:after:bg-slate-950 peer-checked:after:border-cyber-500"></div>
-                </label>
             </div>
         </div>
 
-        <!-- Status Panel -->
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Job Status</h2>
-        <div id="status"
-            class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl font-mono text-xs text-slate-400 leading-relaxed flex items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-700 animate-pulse inline-block flex-shrink-0"></span>
-            <span>Awaiting parameters to spin up transcription engine...</span>
-        </div>
-
-        <!-- Playlist Output Section -->
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mt-8 mb-3">Generated Chapters</h2>
-        <div id="chapters" class="space-y-4">
-            <!-- Empty state fallback design -->
-            <div id="empty-placeholder" class="border border-dashed border-slate-800 rounded-xl py-12 px-4 text-center">
-                <div
-                    class="w-12 h-12 rounded-full bg-slate-900/80 border border-slate-800 flex items-center justify-center mx-auto text-slate-600 mb-3">
-                    <i class="fa-solid fa-music"></i>
+        <!-- Right Column: Supabase Audio Library -->
+        <div class="lg:col-span-5 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyan-950/20 flex flex-col space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-3">
+                <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-database text-cyber-400"></i>
+                    Supabase Audio Library
+                </h3>
+                <button onclick="fetchBucketFiles()" class="text-xs text-cyber-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+            </div>
+            
+            <div id="library-empty-placeholder" class="text-center py-4 text-xs text-slate-500">
+                Loading files from storage bucket...
+            </div>
+            
+            <div id="library-list" class="max-h-[500px] overflow-y-auto space-y-2 pr-1 hidden">
+                <!-- Dynamically populated with checkbox items -->
+            </div>
+            
+            <div id="library-actions" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-800/60 pt-4 hidden">
+                <span id="selected-count" class="text-xs text-slate-400 font-mono">0 files selected</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="bulkDeleteSelected()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 hover:border-rose-500/50 text-rose-400 text-xs font-semibold px-4 py-2 rounded-lg transition-all active:scale-[0.98] flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can text-[10px]"></i> Bulk Delete
+                    </button>
+                    <button onclick="bulkFetchSelected()" class="bg-cyber-500/10 hover:bg-cyber-500/20 border border-cyber-500/30 hover:border-cyber-500/50 text-cyber-400 text-xs font-semibold px-4 py-2 rounded-lg transition-all active:scale-[0.98] flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-down text-[10px]"></i> Bulk Fetch
+                    </button>
                 </div>
-                <h4 class="text-sm font-semibold text-slate-400 mb-1">No audio streaming yet</h4>
-                <p class="text-xs text-slate-600 max-w-xs mx-auto">Input a URL and start a generator job. Your generated
-                    audio segments will stream here dynamically.</p>
             </div>
         </div>
     </div>
@@ -238,6 +274,7 @@
         let currentJobId = null
         let currentPlaybackSpeed = 1.0
         let lastFinishedAudio = null
+        let bucketFilesList = []
 
         async function createJob() {
             const baseUrl = document.getElementById("base_url").value
@@ -282,9 +319,24 @@
                     nextCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
                 }
             } else if (currentIndex === players.length - 1) {
-                // Keep track of the last ended audio so that if a new chapter is dynamically
-                // appended/rendered, we can immediately play it.
                 lastFinishedAudio = currentAudio
+            }
+        }
+
+        async function pauseJob(jobId) {
+            await fetch(`/pause-job/${jobId}`, { method: "POST" })
+            pollJob()
+        }
+
+        async function resumeJob(jobId) {
+            await fetch(`/resume-job/${jobId}`, { method: "POST" })
+            pollJob()
+        }
+
+        async function stopJob(jobId) {
+            if (confirm("Are you sure you want to stop this audiobook generation job?")) {
+                await fetch(`/stop-job/${jobId}`, { method: "POST" })
+                pollJob()
             }
         }
 
@@ -294,94 +346,315 @@
             const response = await fetch(`/job/${currentJobId}`)
             const data = await response.json()
 
-            // Update status widget with beautifully formatted layout
-            let statusColor = 'bg-yellow-500 animate-pulse';
-            if (data.status === 'completed') statusColor = 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
-            if (data.status === 'failed') statusColor = 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]';
+            const statusDiv = document.getElementById("status")
 
-            document.getElementById("status").innerHTML = `
-                <span class="w-2.5 h-2.5 rounded-full ${statusColor} inline-block flex-shrink-0"></span>
-                <div class="flex-1">
-                    <div class="flex justify-between">
-                        <span>Task Status: <strong class="text-slate-200 uppercase">${data.status}</strong></span>
-                        <span class="text-cyan-400 font-semibold">${data.completed.length} / ${data.total} Chapters Done</span>
+            if (data.error) {
+                statusDiv.className = "bg-slate-950/80 border border-slate-800/80 p-4 rounded-xl font-mono text-xs text-slate-400 leading-relaxed flex items-center gap-3 transition-all duration-300"
+                statusDiv.innerHTML = `
+                    <span class="w-2.5 h-2.5 rounded-full bg-slate-700 animate-pulse inline-block flex-shrink-0"></span>
+                    <span>Initializing job...</span>
+                `
+                setTimeout(pollJob, 1000)
+                return
+            }
+
+            let statusColor = 'bg-yellow-500 animate-pulse';
+            let displayStatus = data.status;
+            let borderClass = 'border-slate-800/80';
+            let shadowClass = '';
+            let controlButtons = '';
+
+            if (data.status === 'running') {
+                if (data.paused) {
+                    displayStatus = 'paused';
+                    statusColor = 'bg-amber-500';
+                    borderClass = 'border-amber-500/30';
+                    shadowClass = 'shadow-[0_0_15px_rgba(245,158,11,0.15)]';
+                    controlButtons = `
+                        <div class="flex items-center gap-2">
+                            <button onclick="resumeJob('${currentJobId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all font-sans font-medium text-[11px] active:scale-95">
+                                <i class="fa-solid fa-play"></i> Resume
+                            </button>
+                            <button onclick="stopJob('${currentJobId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/30 text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 transition-all font-sans font-medium text-[11px] active:scale-95">
+                                <i class="fa-solid fa-stop"></i> Stop
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    statusColor = 'bg-cyan-500 animate-pulse';
+                    borderClass = 'border-cyan-500/30';
+                    shadowClass = 'shadow-[0_0_15px_rgba(6,182,212,0.15)]';
+                    controlButtons = `
+                        <div class="flex items-center gap-2">
+                            <button onclick="pauseJob('${currentJobId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition-all font-sans font-medium text-[11px] active:scale-95">
+                                <i class="fa-solid fa-pause"></i> Pause
+                            </button>
+                            <button onclick="stopJob('${currentJobId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/30 text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 transition-all font-sans font-medium text-[11px] active:scale-95">
+                                <i class="fa-solid fa-stop"></i> Stop
+                            </button>
+                        </div>
+                    `;
+                }
+            } else if (data.status === 'completed') {
+                statusColor = 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
+                borderClass = 'border-emerald-500/30';
+                shadowClass = 'shadow-[0_0_15px_rgba(16,185,129,0.15)]';
+            } else if (data.status === 'failed') {
+                statusColor = 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]';
+                borderClass = 'border-rose-500/30';
+                shadowClass = 'shadow-[0_0_15px_rgba(244,63,94,0.15)]';
+            } else if (data.status === 'stopped') {
+                statusColor = 'bg-slate-500';
+                borderClass = 'border-slate-800';
+                shadowClass = '';
+            }
+
+            statusDiv.className = `bg-slate-950/80 border ${borderClass} ${shadowClass} p-4 rounded-xl font-mono text-xs text-slate-400 leading-relaxed transition-all duration-300`;
+
+            statusDiv.innerHTML = `
+                <div class="flex items-center gap-3 w-full">
+                    <span class="w-2.5 h-2.5 rounded-full ${statusColor} inline-block flex-shrink-0"></span>
+                    <div class="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-0.5">
+                            <div>Task Status: <strong class="text-slate-200 uppercase">${displayStatus}</strong></div>
+                            <div class="text-[10px] text-slate-500">ID: ${currentJobId}</div>
+                        </div>
+                        <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
+                            <span class="text-cyan-400 font-semibold font-sans text-xs">${data.completed.length} / ${data.total} Chapters Done</span>
+                            ${controlButtons}
+                        </div>
                     </div>
                 </div>
             `
 
-            const chaptersDiv = document.getElementById("chapters")
-
+            const novelTitle = 'novel'
             for (const chapter in data.audio_files) {
-                if (renderedChapters.has(chapter)) {
+                const cardId = `${novelTitle}_${chapter}`
+                if (renderedChapters.has(cardId)) {
                     continue
                 }
 
-                renderedChapters.add(chapter)
+                renderedChapters.add(cardId)
                 const audioUrl = data.audio_files[chapter]
+                
+                // Parse displayTitle from audioUrl
+                const urlParts = audioUrl.split('/')
+                const encodedFilename = urlParts[urlParts.length - 1]
+                const filename = decodeURIComponent(encodedFilename)
+                const displayTitle = filename.replace(/\.mp3$/i, "")
+                
+                renderChapterCard(cardId, displayTitle, "MP3 Live Stream", audioUrl)
+            }
 
-                // Remove placeholder if active
-                const placeholder = document.getElementById("empty-placeholder")
-                if (placeholder) {
-                    placeholder.remove()
-                }
+            if (data.status === "running") {
+                setTimeout(pollJob, 3000)
+            }
+        }
 
-                // Append safely without disrupting existing active players
-                const chapterHtml = `
-                    <div class="chapter-card bg-slate-950/40 hover:bg-slate-950/60 border border-slate-800/80 p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300" id="card_ch_${chapter}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-                                <i class="fa-solid fa-volume-high text-xs"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-sm text-slate-100">Chapter ${chapter}</h3>
-                                <p class="text-[10px] text-slate-500 font-medium">MP3 Live Stream</p>
-                            </div>
+        function renderChapterCard(id, title, subtitle, audioUrl) {
+            const chaptersDiv = document.getElementById("chapters")
+            
+            if (document.getElementById(`card_ch_${id}`)) {
+                return
+            }
+
+            const placeholder = document.getElementById("empty-placeholder")
+            if (placeholder) {
+                placeholder.remove()
+            }
+
+            const chapterHtml = `
+                <div class="chapter-card bg-slate-950/40 hover:bg-slate-950/60 border border-slate-800/80 p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300" id="card_ch_${id}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
                         </div>
-                        <div class="w-full md:max-w-[420px]">
-                            <audio controls class="audio-player w-full bg-slate-900 rounded-lg">
-                                <source src="${audioUrl}" type="audio/mpeg">
-                            </audio>
+                        <div>
+                            <h3 class="font-semibold text-sm text-slate-100">${title}</h3>
+                            <p class="text-[10px] text-slate-500 font-medium">${subtitle}</p>
                         </div>
                     </div>
-                `
-                chaptersDiv.insertAdjacentHTML('beforeend', chapterHtml)
+                    <div class="w-full md:max-w-[420px]">
+                        <audio controls class="audio-player w-full bg-slate-900 rounded-lg">
+                            <source src="${audioUrl}" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            `
+            chaptersDiv.insertAdjacentHTML('beforeend', chapterHtml)
 
-                // Keep the dynamic playback speed aligned to the slider value
-                const newAudio = chaptersDiv.querySelector(`#card_ch_${chapter} audio`)
-                if (newAudio) {
-                    newAudio.playbackRate = currentPlaybackSpeed
-                    
-                    // Wire up autoplay events and pause coordination
-                    newAudio.addEventListener('ended', handleAudioEnded)
-                    newAudio.addEventListener('play', (e) => {
-                        pauseOtherAudios(e.target)
-                        if (lastFinishedAudio === e.target) {
-                            lastFinishedAudio = null
-                        }
-                    })
+            const newAudio = chaptersDiv.querySelector(`#card_ch_${id} audio`)
+            if (newAudio) {
+                newAudio.playbackRate = currentPlaybackSpeed
+                
+                newAudio.addEventListener('ended', handleAudioEnded)
+                newAudio.addEventListener('play', (e) => {
+                    pauseOtherAudios(e.target)
+                    if (lastFinishedAudio === e.target) {
+                        lastFinishedAudio = null
+                    }
+                })
 
-                    // Handle autoplay for newly rendered chapters if the last chapter just ended
-                    const autoplayEnabled = document.getElementById("autoplay_toggle").checked
-                    if (autoplayEnabled && lastFinishedAudio) {
-                        const players = Array.from(document.querySelectorAll(".audio-player"))
-                        const prevAudioIndex = players.indexOf(lastFinishedAudio)
-                        const newAudioIndex = players.indexOf(newAudio)
-                        if (newAudioIndex === prevAudioIndex + 1) {
-                            lastFinishedAudio = null
-                            newAudio.play().catch(err => {
-                                console.warn("Autoplay for newly loaded chapter failed:", err)
-                            })
-                            const nextCard = newAudio.closest(".chapter-card")
-                            if (nextCard) {
-                                nextCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                            }
+                const autoplayEnabled = document.getElementById("autoplay_toggle").checked
+                if (autoplayEnabled && lastFinishedAudio) {
+                    const players = Array.from(document.querySelectorAll(".audio-player"))
+                    const prevAudioIndex = players.indexOf(lastFinishedAudio)
+                    const newAudioIndex = players.indexOf(newAudio)
+                    if (newAudioIndex === prevAudioIndex + 1) {
+                        lastFinishedAudio = null
+                        newAudio.play().catch(err => {
+                            console.warn("Autoplay for newly loaded chapter failed:", err)
+                        })
+                        const nextCard = newAudio.closest(".chapter-card")
+                        if (nextCard) {
+                            nextCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
                         }
                     }
                 }
             }
+        }
 
-            if (data.status !== "completed") {
-                setTimeout(pollJob, 3000)
+        function formatFilename(filename) {
+            return filename.replace(/\.mp3$/i, "");
+        }
+
+        async function fetchBucketFiles() {
+            const listContainer = document.getElementById("library-list")
+            const placeholder = document.getElementById("library-empty-placeholder")
+            const actions = document.getElementById("library-actions")
+            
+            placeholder.innerText = "Loading files from storage bucket..."
+            placeholder.classList.remove("hidden")
+            listContainer.classList.add("hidden")
+            actions.classList.add("hidden")
+
+            try {
+                const response = await fetch("/bucket-files")
+                bucketFilesList = await response.json()
+                
+                if (bucketFilesList.length === 0) {
+                    placeholder.innerText = "No audio files found in Supabase bucket."
+                    return
+                }
+
+                placeholder.classList.add("hidden")
+                listContainer.classList.remove("hidden")
+                actions.classList.remove("hidden")
+
+                listContainer.innerHTML = bucketFilesList.map((file, index) => {
+                    const displayName = formatFilename(file.filename)
+                    return `
+                        <label class="flex items-center justify-between p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-cyan-500/30 cursor-pointer transition-all">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" data-index="${index}" class="library-checkbox w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 focus:ring-2 accent-cyan-500" onchange="updateSelectedCount()">
+                                <span class="text-xs font-semibold text-slate-200">${displayName}</span>
+                            </div>
+                            <button onclick="deleteFile('${file.filename}', event)" class="w-8 h-8 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:border-rose-500/40 transition-all flex items-center justify-center active:scale-95" title="Delete file">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
+                        </label>
+                    `
+                }).join("")
+
+                updateSelectedCount()
+
+            } catch (err) {
+                console.error("Error fetching bucket files:", err)
+                placeholder.innerText = "Failed to fetch files from bucket."
+            }
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll(".library-checkbox:checked")
+            document.getElementById("selected-count").innerText = `${checkboxes.length} files selected`
+        }
+
+        function bulkFetchSelected() {
+            const checkboxes = document.querySelectorAll(".library-checkbox:checked")
+            if (checkboxes.length === 0) {
+                alert("Please select at least one file to load.")
+                return
+            }
+
+            checkboxes.forEach(cb => {
+                const index = parseInt(cb.getAttribute("data-index"))
+                const file = bucketFilesList[index]
+                if (file) {
+                    const cardId = file.filename.replace(".mp3", "")
+                    const displayName = formatFilename(file.filename)
+                    
+                    renderedChapters.add(cardId)
+                    renderChapterCard(cardId, displayName, "Supabase Library", file.url)
+                }
+            })
+
+            document.querySelectorAll(".library-checkbox").forEach(cb => {
+                cb.checked = false
+            })
+            updateSelectedCount()
+        }
+
+        async function bulkDeleteSelected() {
+            const checkboxes = document.querySelectorAll(".library-checkbox:checked")
+            if (checkboxes.length === 0) {
+                alert("Please select at least one file to delete.")
+                return
+            }
+
+            if (!confirm(`Are you sure you want to delete the ${checkboxes.length} selected files from Supabase?`)) {
+                return
+            }
+
+            const filenamesToDelete = []
+            checkboxes.forEach(cb => {
+                const index = parseInt(cb.getAttribute("data-index"))
+                const file = bucketFilesList[index]
+                if (file) {
+                    filenamesToDelete.push(file.filename)
+                }
+            })
+
+            try {
+                const response = await fetch("/bucket-files/delete", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ filenames: filenamesToDelete })
+                })
+                const data = await response.json()
+                if (data.status === "deleted") {
+                    fetchBucketFiles()
+                } else {
+                    alert("Error deleting files: " + (data.error || "unknown error"))
+                }
+            } catch (err) {
+                console.error("Error bulk deleting files:", err)
+                alert("Failed to delete selected files.")
+            }
+        }
+
+        async function deleteFile(filename, event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!confirm(`Are you sure you want to delete "${filename}" from Supabase?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/bucket-file/${encodeURIComponent(filename)}`, {
+                    method: "DELETE"
+                });
+                const data = await response.json();
+                if (data.status === "deleted") {
+                    fetchBucketFiles();
+                } else {
+                    alert("Error deleting file: " + (data.error || "unknown error"));
+                }
+            } catch (err) {
+                console.error("Error deleting file:", err);
+                alert("Failed to delete file.");
             }
         }
 
@@ -389,12 +662,13 @@
             currentPlaybackSpeed = parseFloat(val)
             document.getElementById("speed_value").innerText = `${currentPlaybackSpeed.toFixed(2)}x`
 
-            // Adjust speeds across all active players instantly without skipping
             const players = document.querySelectorAll(".audio-player")
             players.forEach(player => {
                 player.playbackRate = currentPlaybackSpeed
             })
         }
+
+        window.addEventListener('DOMContentLoaded', fetchBucketFiles)
     </script>
 
 </body>
