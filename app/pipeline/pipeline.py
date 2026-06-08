@@ -24,6 +24,12 @@ async def producer(
         url,
         current_chapter
     )
+    if not template:
+        current = str(current_chapter)
+        if current in url:
+            template = url.replace(current, "{}", 1)
+        else:
+            template = url
 
     for i in range(start, end + 1):
 
@@ -31,15 +37,27 @@ async def producer(
         if jobs[job_id]["stopped"]:
             break
 
-        # PAUSE SUPPORT
-        while jobs[job_id]["paused"]:
-            await asyncio.sleep(1)
 
-        chapter_url = template.format(i)
 
-        data = await fetch_chapter(
-            chapter_url
-        )
+        chapter_url = template.format(i) if "{}" in template else template
+
+        data = None
+        for attempt in range(3):
+            try:
+                data = await fetch_chapter(chapter_url)
+                if data and "error" not in data:
+                    break
+                await asyncio.sleep(1)
+            except Exception as e:
+                print(f"Attempt {attempt+1} failed to fetch {chapter_url}: {e}")
+                await asyncio.sleep(1)
+
+        if not data or "error" in data:
+            err_msg = data.get("error", "Unknown error") if data else "Network error"
+            data = {
+                "title": f"Chapter {i} (Fetch Error)",
+                "content": f"Failed to fetch content for chapter {i}. Error: {err_msg}"
+            }
 
         await queue.put({
             "chapter": i,
@@ -91,9 +109,11 @@ async def consumer(job_id: str, queue: asyncio.Queue):
                 filename
             )
 
-            jobs[job_id]["completed"].append(i)
-
-            jobs[job_id]["audio_files"][i] = public_url
+            if public_url:
+                jobs[job_id]["completed"].append(i)
+                jobs[job_id]["audio_files"][i] = public_url
+            else:
+                print(f"Skipping chapter {i} from list due to upload failure.")
 
         except Exception as e:
 
@@ -116,6 +136,7 @@ async def run_pipeline(
     end: int
 ):
 
+    os.makedirs("output", exist_ok=True)
 
     jobs[job_id] = {
         "status": "running",
@@ -127,7 +148,7 @@ async def run_pipeline(
         "stopped": False
     }
 
-    queue = asyncio.Queue(maxsize=1)
+    queue = asyncio.Queue()
 
     try:
 
