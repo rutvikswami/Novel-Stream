@@ -1,25 +1,16 @@
-import aiohttp
 from bs4 import BeautifulSoup
 import re
+import asyncio
+import nodriver as uc
+import aiohttp
 
-async def fetch_chapter(url: str):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            html = await response.text()
-
+def detect_content_selector(html: str):
     soap = BeautifulSoup(html, "html.parser")
-
+    
     # Decompose script, style, noscript, and iframe elements first to avoid noise
     for tag in soap(["script", "style", "noscript", "iframe"]):
         tag.decompose()
 
-    best_element = None
-    best_score = -999999
-
-    # Candidates are typically div, article, section, or main elements
     candidates = []
     for tag_name in ["div", "article", "section", "main"]:
         for element in soap.find_all(tag_name):
@@ -56,14 +47,16 @@ async def fetch_chapter(url: str):
             if any(term in class_id_str for term in ["chapter-content", "chapter_content", "chaptercontent"]):
                 score += 50
 
-            positive_keywords = ["chapter", "content", "novel", "text", "story", "read", "book", "entry", "post", "main-content", "body"]
-            negative_keywords = ["comment", "footer", "header", "nav", "sidebar", "menu", "author", "recommend", "related", "ad", "social", "share", "widget", "meta", "reply", "list", "aside"]
+            class_words = set(re.findall(r'[a-zA-Z0-9]+', class_id_str))
+
+            positive_keywords = {"chapter", "content", "novel", "text", "txt", "story", "read", "reader", "reading", "book", "entry", "post", "body"}
+            negative_keywords = {"comment", "comments", "footer", "header", "nav", "sidebar", "menu", "author", "recommend", "recommended", "related", "ad", "ads", "advertisement", "social", "share", "widget", "meta", "reply", "list", "aside"}
 
             for word in positive_keywords:
-                if word in class_id_str:
+                if word in class_words:
                     score += 5
             for word in negative_keywords:
-                if word in class_id_str:
+                if word in class_words:
                     score -= 10
 
             # 4. Paragraph count scoring
@@ -111,55 +104,137 @@ async def fetch_chapter(url: str):
                     break
 
     # Find candidate with the highest score
+    best_element = None
+    best_score = -999999
     for element, score in candidates:
         if score > best_score:
             best_score = score
             best_element = element
 
     if not best_element or best_score < 0:
+        return None
+
+    # Construct the selector dictionary
+    selector = {"tag": best_element.name}
+    elem_id = best_element.get("id")
+    if elem_id:
+        selector["id"] = elem_id
+    else:
+        classes = best_element.get("class")
+        if classes:
+            if isinstance(classes, str):
+                classes = [classes]
+            selector["class"] = classes
+            
+    return selector
+
+async def fetch_html(url: str) -> str:
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    if "Enable JavaScript and cookies to continue" not in html and "cf-challenge" not in html:
+                        print("Successfully fetched without uc:", url)
+                        return html
+    except Exception as e:
+        print("Failed to fetch without uc, falling back to uc:", e)
+
+    browser = await uc.start()
+    try:
+        page = await browser.get(url)
+        await asyncio.sleep(5)
+        html = await page.get_content()
+    finally:
+        browser.stop()
+
+    if "Enable JavaScript and cookies to continue" in html or "cf-challenge" in html:
+        raise Exception("Failed to bypass Cloudflare challenge (Enable JavaScript and cookies to continue)")
+
+    return html
+
+async def detect_selector(url: str):
+    html = await fetch_html(url)
+    return detect_content_selector(html)
+
+async def fetch_chapter(url: str, selector: dict = None):
+    html = await fetch_html(url)
+    soup = BeautifulSoup(html, "html.parser")
+
+    best_element = None
+
+    if selector:
+        tag_name = selector.get("tag", "div")
+        if "id" in selector:
+            best_element = soup.find(tag_name, id=selector["id"])
+        elif "class" in selector:
+            target_classes = selector["class"]
+            if isinstance(target_classes, str):
+                target_classes = [target_classes]
+            # Find elements matching all classes in selector['class']
+            for elem in soup.find_all(tag_name):
+                elem_classes = elem.get("class") or []
+                if isinstance(elem_classes, str):
+                    elem_classes = [elem_classes]
+                if all(c in elem_classes for c in target_classes):
+                    best_element = elem
+                    break
+        else:
+            best_element = soup.find(tag_name)
+
+    # Fallback to heuristics if selector wasn't provided or not found
+    if not best_element:
+        detected_sel = detect_content_selector(html)
+        if detected_sel:
+            tag_name = detected_sel.get("tag", "div")
+            if "id" in detected_sel:
+                best_element = soup.find(tag_name, id=detected_sel["id"])
+            elif "class" in detected_sel:
+                target_classes = detected_sel["class"]
+                for elem in soup.find_all(tag_name):
+                    elem_classes = elem.get("class") or []
+                    if all(c in elem_classes for c in target_classes):
+                        best_element = elem
+                        break
+            else:
+                best_element = soup.find(tag_name)
+
+    if not best_element:
         return {
             "error": "Chapter content not found"
         }
 
-    # Clean up any child elements inside best_element that represent comments, ads, footers, etc.
-    for child in best_element.find_all(["div", "p", "span", "section"]):
-        classes = child.get("class") or []
-        if isinstance(classes, str):
-            classes = [classes]
-        class_id_str = " ".join(classes).lower() + " " + (child.get("id") or "").lower()
-        negative_keywords = ["comment", "footer", "header", "nav", "sidebar", "menu", "author", "recommend", "related", "ad", "social", "share", "widget", "meta", "reply", "list", "aside"]
-        if any(word in class_id_str for word in negative_keywords):
-            child.decompose()
+    # remove scripts
+    for tag in best_element.find_all(["script", "style"]):
+        tag.decompose()
 
-    # Extract text from paragraphs if available
-    paragraphs = best_element.find_all('p')
-    if len(paragraphs) >= 3:
-        clean_text = []
-        for p in paragraphs:
-            text = p.get_text(strip=True)
-            if text:
-                clean_text.append(text)
-        final_text = "\n\n".join(clean_text)
-    else:
-        # Fallback for sites with text directly in the div or separated by <br> tags
-        elem_copy = BeautifulSoup(str(best_element), "html.parser")
-        for br in elem_copy.find_all("br"):
-            br.replace_with("\n")
-        for p in elem_copy.find_all("p"):
-            p.insert_before("\n")
-            p.insert_after("\n")
-        raw_text = elem_copy.get_text()
-        lines = [line.strip() for line in raw_text.splitlines()]
-        clean_text = []
-        for line in lines:
-            if line:
-                clean_text.append(line)
-        final_text = "\n\n".join(clean_text)
+    paragraphs = []
 
-    title = soap.title.string if soap.title else "No title"
+    for p in best_element.find_all("p"):
+        text = p.get_text(" ", strip=True)
+
+        if not text:
+            continue
+
+        if "Visit and read more novel" in text:
+            continue
+
+        paragraphs.append(text)
+
+    novel_title = soup.select_one("h1.tit")
+    chapter_title = soup.select_one("span.chapter")
+    
+    chapter_title_text = chapter_title.get_text(strip=True) if chapter_title else ""
+    title_val = chapter_title_text if chapter_title_text else (soup.title.string.strip() if (soup.title and soup.title.string) else "No title")
+
     return {
-        "title": title.strip() if title else "No title",
-        "content": final_text
+        "title": title_val,
+        "novel": novel_title.get_text(strip=True) if novel_title else "",
+        "chapter": chapter_title_text,
+        "content": "\n\n".join(paragraphs)
     }
 
 async def detect_template(

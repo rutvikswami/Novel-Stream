@@ -7,3 +7,5 @@ supabase
 python-dotenv
 jinja2
 lxml
+playwright
+nodriver

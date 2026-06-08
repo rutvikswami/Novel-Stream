@@ -2,7 +2,8 @@ import asyncio
 from app.tts.tts import generate_tts
 from app.scraper.async_scraper import (
     fetch_chapter,
-    detect_template
+    detect_template,
+    detect_selector
 )
 from app.state.jobs import jobs
 from app.storage.storage import upload_audio
@@ -17,7 +18,8 @@ async def producer(
     current_chapter: int,
     start: int,
     end: int,
-    queue: asyncio.Queue
+    queue: asyncio.Queue,
+    selector: dict = None
 ):
 
     template = await detect_template(
@@ -44,7 +46,7 @@ async def producer(
         data = None
         for attempt in range(3):
             try:
-                data = await fetch_chapter(chapter_url)
+                data = await fetch_chapter(chapter_url, selector=selector)
                 if data and "error" not in data:
                     break
                 await asyncio.sleep(1)
@@ -150,6 +152,14 @@ async def run_pipeline(
 
     queue = asyncio.Queue()
 
+    # Detect selector once at start of pipeline
+    selector = None
+    try:
+        selector = await detect_selector(url)
+        print(f"Detected content selector for job {job_id}: {selector}")
+    except Exception as e:
+        print(f"Failed to detect selector: {e}")
+
     try:
 
         await asyncio.gather(
@@ -159,7 +169,8 @@ async def run_pipeline(
                 current_chapter,
                 start,
                 end,
-                queue
+                queue,
+                selector
             ),
             consumer(job_id, queue)
         )
