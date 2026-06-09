@@ -149,8 +149,8 @@ async def fetch_html(url: str) -> str:
         await asyncio.sleep(5)
         html = await page.get_content()
     finally:
-        browser.stop()
-
+        await browser.stop()
+        
     if "Enable JavaScript and cookies to continue" in html or "cf-challenge" in html:
         raise Exception("Failed to bypass Cloudflare challenge (Enable JavaScript and cookies to continue)")
 
