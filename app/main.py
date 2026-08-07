@@ -93,15 +93,15 @@ async def stop_job(job_id: str):
 async def get_bucket_files():
     import re
     try:
-        # List files from Supabase storage bucket 'audio-files'
-        files = supabase.storage.from_("audio-files").list()
+        # List files from Supabase storage bucket 'audio_files'
+        files = supabase.storage.from_("audio_files").list()
 
         # Parse and filter files
         audio_files = []
         for file in files:
             name = file.get("name", "")
             if name.endswith(".mp3"):
-                public_url = supabase.storage.from_("audio-files").get_public_url(name)
+                public_url = supabase.storage.from_("audio_files").get_public_url(name)
                 audio_files.append({
                     "filename": name,
                     "url": public_url
@@ -123,7 +123,7 @@ async def get_bucket_files():
 async def delete_bucket_file(filename: str):
     try:
         # Delete from Supabase storage bucket
-        supabase.storage.from_("audio-files").remove([filename])
+        supabase.storage.from_("audio_files").remove([filename])
 
         # Also clean up from audio_cleanup table
         supabase.table("audio_cleanup").delete().eq("filename", filename).execute()
@@ -140,7 +140,7 @@ async def delete_bucket_files(req: DeleteFilesRequest):
         if not req.filenames:
             return {"status": "success", "message": "No files specified"}
         # Delete from Supabase storage bucket
-        supabase.storage.from_("audio-files").remove(req.filenames)
+        supabase.storage.from_("audio_files").remove(req.filenames)
 
         # Also clean up from audio_cleanup table
         supabase.table("audio_cleanup").delete().in_("filename", req.filenames).execute()
