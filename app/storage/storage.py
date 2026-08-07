@@ -18,7 +18,7 @@ def upload_audio(filepath: str, filename: str):
         with open(filepath, "rb") as f:
 
             response = supabase.storage.from_(
-                "audio-files"
+                "audio_files"
             ).upload(
                 path=filename,
                 file=f,
