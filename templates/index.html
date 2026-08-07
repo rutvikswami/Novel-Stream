@@ -550,7 +550,7 @@
                 // Slice to show at most the 10 most recent files
                 const filesToShow = bucketFilesList.slice(-10)
 
-                listContainer.innerHTML = filesToShow.map((file) => {
+                listContainer.innerHTML = bucketFilesList.map((file) => {
                     const displayName = formatFilename(file.filename)
                     return `
                         <label class="flex items-center justify-between p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-cyan-500/30 cursor-pointer transition-all">
