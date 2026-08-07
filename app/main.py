@@ -94,7 +94,7 @@ async def get_bucket_files():
     import re
     try:
         # List files from Supabase storage bucket 'audio_files'
-        files = supabase.storage.from_("audio_files").list()
+        files = supabase.storage.from_("audio_files").list("",limit=1000,offset=0)
 
         # Parse and filter files
         audio_files = []
