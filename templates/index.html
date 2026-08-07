@@ -547,9 +547,6 @@
                 listContainer.classList.remove("hidden")
                 actions.classList.remove("hidden")
 
-                // Slice to show at most the 10 most recent files
-                const filesToShow = bucketFilesList.slice(-10)
-
                 listContainer.innerHTML = bucketFilesList.map((file) => {
                     const displayName = formatFilename(file.filename)
                     return `
