@@ -587,25 +587,172 @@ export default function App() {
     }
   };
 
-  // 4. Fetch Supabase Storage Files via Backend API
+  // 4. Fetch Supabase Storage Files via Direct SDK or Backend Fallback
   const fetchLibrary = async () => {
     setIsLoadingLibrary(true);
     setLibraryError('');
     try {
-      const response = await fetch(`${API_BASE}/bucket-files`);
-      const data = await response.json();
-      if (data.error) {
-        setLibraryError(data.error);
-        setLibrary([]);
+      if (supabase) {
+        // Fetch files directly from Supabase Storage
+        const { data: files, error } = await supabase.storage.from("audio_files").list("", {
+          limit: 100
+        });
+        if (error) throw error;
+
+        // Build a set of all .vtt files for quick lookup
+        const vttFiles = new Set(
+          (files || [])
+            .map(f => f.name)
+            .filter(name => name && name.endsWith('.vtt'))
+        );
+
+        // Filter and format as audio library files
+        const audioFiles = (files || [])
+          .filter(f => f.name && f.name.endsWith('.mp3'))
+          .map(f => {
+            const name = f.name;
+            const publicUrl = supabase.storage.from("audio_files").getPublicUrl(name).data.publicUrl;
+            const vttName = name.replace('.mp3', '.vtt');
+            const vttUrl = vttFiles.has(vttName)
+              ? supabase.storage.from("audio_files").getPublicUrl(vttName).data.publicUrl
+              : null;
+            
+            const metadata = f.metadata || {};
+            const size = metadata.size || 0;
+            const createdAt = f.created_at || '';
+
+            return {
+              filename: name,
+              url: publicUrl,
+              subtitle_url: vttUrl,
+              size: size,
+              created_at: createdAt
+            };
+          });
+
+        // Natural sort helper function
+        const naturalSort = (a, b) => {
+          const parse = (str) => str.split(/(\d+)/).map(text => {
+            const num = parseInt(text, 10);
+            return isNaN(num) ? text.toLowerCase() : num;
+          });
+          const partsA = parse(a.filename);
+          const partsB = parse(b.filename);
+          for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+            if (partsA[i] === undefined) return -1;
+            if (partsB[i] === undefined) return 1;
+            if (partsA[i] !== partsB[i]) {
+              return partsA[i] < partsB[i] ? -1 : 1;
+            }
+          }
+          return 0;
+        };
+
+        audioFiles.sort(naturalSort);
+        setLibrary(audioFiles);
       } else {
-        setLibrary(data);
+        // Fallback to backend API
+        const response = await fetch(`${API_BASE}/bucket-files`);
+        const data = await response.json();
+        if (data.error) {
+          setLibraryError(data.error);
+          setLibrary([]);
+        } else {
+          setLibrary(data);
+        }
       }
     } catch (err) {
       console.error('Error fetching library:', err);
-      setLibraryError(err.message || 'Failed to fetch library files from backend.');
+      setLibraryError(err.message || 'Failed to fetch library files.');
     } finally {
       setIsLoadingLibrary(false);
     }
+  };
+
+  // Helper to update local states after rename
+  const updateLocalStateAfterRename = (oldName, newName) => {
+    // Update library list
+    setLibrary(prev => prev.map(item => {
+      if (item.filename === oldName) {
+        const updatedUrl = item.url.replace(encodeURIComponent(oldName), encodeURIComponent(newName));
+        const updatedSubtitleUrl = item.subtitle_url
+          ? item.subtitle_url.replace(
+            encodeURIComponent(oldName.replace('.mp3', '.vtt')),
+            encodeURIComponent(newName.replace('.mp3', '.vtt'))
+          )
+          : null;
+        return {
+          ...item,
+          filename: newName,
+          url: updatedUrl,
+          subtitle_url: updatedSubtitleUrl
+        };
+      }
+      return item;
+    }));
+
+    // Update playlist queue
+    setPlaylist(prev => prev.map(item => {
+      const cardId = oldName.replace('.mp3', '');
+      if (item.id === cardId) {
+        const newCardId = newName.replace('.mp3', '');
+        const updatedUrl = item.url.replace(encodeURIComponent(oldName), encodeURIComponent(newName));
+        const updatedSubtitleUrl = item.subtitleUrl
+          ? item.subtitleUrl.replace(
+            encodeURIComponent(oldName.replace('.mp3', '.vtt')),
+            encodeURIComponent(newName.replace('.mp3', '.vtt'))
+          )
+          : null;
+
+        const updatedTrack = {
+          ...item,
+          id: newCardId,
+          title: newName.replace('.mp3', ''),
+          url: updatedUrl,
+          subtitleUrl: updatedSubtitleUrl
+        };
+
+        // If it is the current track, sync active player info
+        if (currentTrack?.id === cardId) {
+          setCurrentTrack(updatedTrack);
+        }
+
+        return updatedTrack;
+      }
+      return item;
+    }));
+
+    setEditingFilename(null);
+  };
+
+  // Helper to update local states after delete
+  const updateLocalStateAfterDelete = (filename) => {
+    setLibrary(prev => prev.filter(f => f.filename !== filename));
+    const cardId = filename.replace('.mp3', '');
+    setPlaylist(prev => prev.filter(t => t.id !== cardId));
+    if (currentTrack?.id === cardId) {
+      if (audioRef.current) audioRef.current.pause();
+      setCurrentTrack(null);
+      setIsPlaying(false);
+      setActiveCaption('');
+      setCues([]);
+    }
+    setSelectedLibraryFiles(prev => prev.filter(f => f !== filename));
+  };
+
+  // Helper to update local states after bulk delete
+  const updateLocalStateAfterBulkDelete = (filenames) => {
+    setLibrary(prev => prev.filter(f => !filenames.includes(f.filename)));
+    const cardIds = filenames.map(fn => fn.replace('.mp3', ''));
+    setPlaylist(prev => prev.filter(t => !cardIds.includes(t.id)));
+    if (cardIds.includes(currentTrack?.id)) {
+      if (audioRef.current) audioRef.current.pause();
+      setCurrentTrack(null);
+      setIsPlaying(false);
+      setActiveCaption('');
+      setCues([]);
+    }
+    setSelectedLibraryFiles([]);
   };
 
   // 5. In-place Rename (CRUD Update)
@@ -630,74 +777,58 @@ export default function App() {
       return;
     }
     try {
-      const response = await fetch(`${API_BASE}/bucket-file/rename`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          old_filename: file.filename,
-          new_filename: cleanNewName
-        })
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        // Update library list
-        setLibrary(prev => prev.map(item => {
-          if (item.filename === file.filename) {
-            const updatedUrl = item.url.replace(encodeURIComponent(file.filename), encodeURIComponent(cleanNewName));
-            const updatedSubtitleUrl = item.subtitle_url
-              ? item.subtitle_url.replace(
-                encodeURIComponent(file.filename.replace('.mp3', '.vtt')),
-                encodeURIComponent(cleanNewName.replace('.mp3', '.vtt'))
-              )
-              : null;
-            return {
-              ...item,
-              filename: cleanNewName,
-              url: updatedUrl,
-              subtitle_url: updatedSubtitleUrl
-            };
-          }
-          return item;
-        }));
+      if (supabase) {
+        // Rename MP3 file via Supabase Storage directly
+        const { error: moveError } = await supabase.storage.from("audio_files").move(file.filename, cleanNewName);
+        if (moveError) throw moveError;
 
-        // Update playlist queue
-        setPlaylist(prev => prev.map(item => {
-          const cardId = file.filename.replace('.mp3', '');
-          if (item.id === cardId) {
-            const newCardId = cleanNewName.replace('.mp3', '');
-            const updatedUrl = item.url.replace(encodeURIComponent(file.filename), encodeURIComponent(cleanNewName));
-            const updatedSubtitleUrl = item.subtitleUrl
-              ? item.subtitleUrl.replace(
-                encodeURIComponent(file.filename.replace('.mp3', '.vtt')),
-                encodeURIComponent(cleanNewName.replace('.mp3', '.vtt'))
-              )
-              : null;
+        // Try database update (best-effort)
+        try {
+          await supabase.from("audio_cleanup").update({ filename: cleanNewName }).eq("filename", file.filename);
+        } catch (dbErr) {
+          console.warn("DB audio_cleanup update failed:", dbErr);
+        }
 
-            const updatedTrack = {
-              ...item,
-              id: newCardId,
-              title: editValue.trim(),
-              url: updatedUrl,
-              subtitleUrl: updatedSubtitleUrl
-            };
-
-            // If it is the current track, sync active player info
-            if (currentTrack?.id === cardId) {
-              setCurrentTrack(updatedTrack);
+        // Rename VTT file if it exists
+        const oldVtt = file.filename.replace('.mp3', '.vtt');
+        const newVtt = cleanNewName.replace('.mp3', '.vtt');
+        try {
+          const { data: vttFiles } = await supabase.storage.from("audio_files").list("", {
+            limit: 100
+          });
+          if (vttFiles && vttFiles.some(f => f.name === oldVtt)) {
+            await supabase.storage.from("audio_files").move(oldVtt, newVtt);
+            try {
+              await supabase.from("audio_cleanup").update({ filename: newVtt }).eq("filename", oldVtt);
+            } catch (dbErr) {
+              console.warn("DB audio_cleanup VTT update failed:", dbErr);
             }
-
-            return updatedTrack;
           }
-          return item;
-        }));
+        } catch (vttErr) {
+          console.warn("VTT rename check failed:", vttErr);
+        }
 
-        setEditingFilename(null);
+        updateLocalStateAfterRename(file.filename, cleanNewName);
       } else {
-        alert('Rename failed: ' + (data.error || 'Unknown error'));
+        // Fallback to backend API
+        const response = await fetch(`${API_BASE}/bucket-file/rename`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            old_filename: file.filename,
+            new_filename: cleanNewName
+          })
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          updateLocalStateAfterRename(file.filename, cleanNewName);
+        } else {
+          alert('Rename failed: ' + (data.error || 'Unknown error'));
+        }
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to connect to server for rename.');
+      alert('Failed to rename: ' + err.message);
     }
   };
 
@@ -707,28 +838,35 @@ export default function App() {
       return;
     }
     try {
-      const response = await fetch(`${API_BASE}/bucket-file/${encodeURIComponent(filename)}`, {
-        method: 'DELETE'
-      });
-      const data = await response.json();
-      if (data.status === 'deleted') {
-        setLibrary(prev => prev.filter(f => f.filename !== filename));
-        const cardId = filename.replace('.mp3', '');
-        setPlaylist(prev => prev.filter(t => t.id !== cardId));
-        if (currentTrack?.id === cardId) {
-          audioRef.current.pause();
-          setCurrentTrack(null);
-          setIsPlaying(false);
-          setActiveCaption('');
-          setCues([]);
+      if (supabase) {
+        // Delete MP3 and corresponding VTT directly from Supabase Storage
+        const filesToDelete = [filename, filename.replace('.mp3', '.vtt')];
+        const { error: removeError } = await supabase.storage.from("audio_files").remove(filesToDelete);
+        if (removeError) throw removeError;
+
+        // Try database cleanup (best-effort)
+        try {
+          await supabase.from("audio_cleanup").delete().in("filename", filesToDelete);
+        } catch (dbErr) {
+          console.warn("DB audio_cleanup delete failed:", dbErr);
         }
-        setSelectedLibraryFiles(prev => prev.filter(f => f !== filename));
+
+        updateLocalStateAfterDelete(filename);
       } else {
-        alert('Delete failed: ' + (data.error || 'Unknown error'));
+        // Fallback to backend API
+        const response = await fetch(`${API_BASE}/bucket-file/${encodeURIComponent(filename)}`, {
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        if (data.status === 'deleted') {
+          updateLocalStateAfterDelete(filename);
+        } else {
+          alert('Delete failed: ' + (data.error || 'Unknown error'));
+        }
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to connect to server for delete.');
+      alert('Failed to delete file: ' + err.message);
     }
   };
 
@@ -744,29 +882,43 @@ export default function App() {
     if (!confirm(`Delete all ${selectedLibraryFiles.length} selected files from storage?`)) return;
 
     try {
-      const response = await fetch(`${API_BASE}/bucket-files/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filenames: selectedLibraryFiles })
-      });
-      const data = await response.json();
-      if (data.status === 'deleted') {
-        fetchLibrary();
-        const cardIds = selectedLibraryFiles.map(fn => fn.replace('.mp3', ''));
-        setPlaylist(prev => prev.filter(t => !cardIds.includes(t.id)));
-        if (cardIds.includes(currentTrack?.id)) {
-          audioRef.current.pause();
-          setCurrentTrack(null);
-          setIsPlaying(false);
-          setActiveCaption('');
-          setCues([]);
+      if (supabase) {
+        // Prepare list of files to delete (MP3 and VTT)
+        const filesToDelete = [];
+        selectedLibraryFiles.forEach(fn => {
+          filesToDelete.push(fn);
+          filesToDelete.push(fn.replace('.mp3', '.vtt'));
+        });
+
+        // Delete directly from Supabase Storage
+        const { error: removeError } = await supabase.storage.from("audio_files").remove(filesToDelete);
+        if (removeError) throw removeError;
+
+        // Try database cleanup (best-effort)
+        try {
+          await supabase.from("audio_cleanup").delete().in("filename", filesToDelete);
+        } catch (dbErr) {
+          console.warn("DB audio_cleanup bulk delete failed:", dbErr);
         }
-        setSelectedLibraryFiles([]);
+
+        updateLocalStateAfterBulkDelete(selectedLibraryFiles);
       } else {
-        alert('Bulk delete failed: ' + (data.error || 'Unknown error'));
+        // Fallback to backend API
+        const response = await fetch(`${API_BASE}/bucket-files/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filenames: selectedLibraryFiles })
+        });
+        const data = await response.json();
+        if (data.status === 'deleted') {
+          updateLocalStateAfterBulkDelete(selectedLibraryFiles);
+        } else {
+          alert('Bulk delete failed: ' + (data.error || 'Unknown error'));
+        }
       }
     } catch (err) {
       console.error(err);
+      alert('Bulk delete failed: ' + err.message);
     }
   };
 
