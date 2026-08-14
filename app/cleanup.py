@@ -15,7 +15,7 @@ for row in rows.data:
     filename = row["filename"]
     try:
         supabase.storage.from_(
-            "audio-files"
+            "audio_files"
         ).remove([filename])
         supabase.table(
             "audio_cleanup"

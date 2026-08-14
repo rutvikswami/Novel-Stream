@@ -146,7 +146,7 @@ Storage
 Bucket name:
 
 ```text
-audio-files
+audio_files
 ```
 
 Enable:
@@ -188,7 +188,7 @@ public
 ### WITH CHECK
 
 ```sql
-bucket_id = 'audio-files'
+bucket_id = 'audio_files'
 ```
 
 ---
@@ -204,7 +204,7 @@ SELECT
 ### USING
 
 ```sql
-bucket_id = 'audio-files'
+bucket_id = 'audio_files'
 ```
 
 ---
@@ -220,13 +220,13 @@ UPDATE
 ### USING
 
 ```sql
-bucket_id = 'audio-files'
+bucket_id = 'audio_files'
 ```
 
 ### WITH CHECK
 
 ```sql
-bucket_id = 'audio-files'
+bucket_id = 'audio_files'
 ```
 
 ---
@@ -247,7 +247,7 @@ on storage.objects
 for insert
 to public
 with check (
-    bucket_id = 'audio-files'
+    bucket_id = 'audio_files'
 );
 
 create policy "Allow reads"
@@ -255,7 +255,7 @@ on storage.objects
 for select
 to public
 using (
-    bucket_id = 'audio-files'
+    bucket_id = 'audio_files'
 );
 
 create policy "Allow updates"
@@ -263,10 +263,10 @@ on storage.objects
 for update
 to public
 using (
-    bucket_id = 'audio-files'
+    bucket_id = 'audio_files'
 )
 with check (
-    bucket_id = 'audio-files'
+    bucket_id = 'audio_files'
 );
 ```
 

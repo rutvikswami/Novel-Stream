@@ -91,6 +91,7 @@ async def consumer(job_id: str, queue: asyncio.Queue):
         data = item["data"]
 
         output_file = f"output/{i}.mp3"
+        subtitles_file = f"output/{i}.vtt"
 
         jobs[job_id]["current_tts"] = i
 
@@ -98,22 +99,33 @@ async def consumer(job_id: str, queue: asyncio.Queue):
 
             await generate_tts(
                 data["content"],
-                output_file
+                output_file,
+                subtitles_file
             )
 
             # Get title and sanitize it
             chapter_title = data.get("title", f"Chapter {i}").strip()
             safe_title = re.sub(r'[\\/*?:"<>|]', '', chapter_title).strip()
             filename = f"{safe_title}({i}).mp3"
+            vtt_filename = f"{safe_title}({i}).vtt"
 
             public_url = upload_audio(
                 output_file,
                 filename
             )
 
+            vtt_url = None
+            if os.path.exists(subtitles_file):
+                vtt_url = upload_audio(
+                    subtitles_file,
+                    vtt_filename
+                )
+
             if public_url:
                 jobs[job_id]["completed"].append(i)
                 jobs[job_id]["audio_files"][i] = public_url
+                if vtt_url:
+                    jobs[job_id]["subtitles_files"][i] = vtt_url
             else:
                 print(f"Skipping chapter {i} from list due to upload failure.")
 
@@ -128,6 +140,8 @@ async def consumer(job_id: str, queue: asyncio.Queue):
 
             if os.path.exists(output_file):
                 os.remove(output_file)
+            if os.path.exists(subtitles_file):
+                os.remove(subtitles_file)
 
 
 async def run_pipeline(
@@ -145,6 +159,7 @@ async def run_pipeline(
         "completed": [],
         "current_tts": None,
         "audio_files": {},
+        "subtitles_files": {},
         "total": end - start + 1,
         "paused": False,
         "stopped": False

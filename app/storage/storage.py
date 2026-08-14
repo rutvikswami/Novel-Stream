@@ -13,8 +13,14 @@ supabase = create_client(
 )
 
 
-def upload_audio(filepath: str, filename: str):
+def upload_audio(filepath: str, filename: str, content_type: str = None):
     try:
+        if not content_type:
+            if filename.endswith(".vtt"):
+                content_type = "text/vtt"
+            else:
+                content_type = "audio/mpeg"
+
         with open(filepath, "rb") as f:
 
             response = supabase.storage.from_(
@@ -23,7 +29,7 @@ def upload_audio(filepath: str, filename: str):
                 path=filename,
                 file=f,
                 file_options={
-                    "content-type": "audio/mpeg",
+                    "content-type": content_type,
                     "upsert": "true"
                 }
             )
@@ -35,7 +41,7 @@ def upload_audio(filepath: str, filename: str):
         }).execute()
 
         public_url = supabase.storage.from_(
-            "audio-files"
+            "audio_files"
         ).get_public_url(filename)
 
         print("Upload success:", response)

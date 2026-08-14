@@ -9,3 +9,5 @@ jinja2
 lxml
 playwright
 nodriver
+pypdf
+python-docx

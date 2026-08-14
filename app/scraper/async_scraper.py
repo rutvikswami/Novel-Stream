@@ -7,7 +7,6 @@ import aiohttp
 def detect_content_selector(html: str):
     soap = BeautifulSoup(html, "html.parser")
     
-    # Decompose script, style, noscript, and iframe elements first to avoid noise
     for tag in soap(["script", "style", "noscript", "iframe"]):
         tag.decompose()
 
@@ -17,13 +16,12 @@ def detect_content_selector(html: str):
             text = element.get_text(strip=True)
             length = len(text)
             
-            # Skip/ignore very short elements as candidates
             if length < 200:
                 continue
 
             score = 0
 
-            # 1. Text length scoring
+
             if length > 1000:
                 score += 5
             if length > 2000:
@@ -174,7 +172,6 @@ async def fetch_chapter(url: str, selector: dict = None):
             target_classes = selector["class"]
             if isinstance(target_classes, str):
                 target_classes = [target_classes]
-            # Find elements matching all classes in selector['class']
             for elem in soup.find_all(tag_name):
                 elem_classes = elem.get("class") or []
                 if isinstance(elem_classes, str):
@@ -185,7 +182,6 @@ async def fetch_chapter(url: str, selector: dict = None):
         else:
             best_element = soup.find(tag_name)
 
-    # Fallback to heuristics if selector wasn't provided or not found
     if not best_element:
         detected_sel = detect_content_selector(html)
         if detected_sel:
