@@ -4,7 +4,8 @@ import { Search, Bell, ChevronDown } from 'lucide-react';
 export default function Header({ activeTab, setActiveTab, librarySearch, setLibrarySearch }) {
   const getTabTitle = () => {
     switch (activeTab) {
-      case 'player': return 'Now Playing & Queue';
+      case 'player': return 'Now Playing';
+      case 'queue': return 'Play Queue';
       case 'library': return 'Audio Library';
       case 'generate': return 'Generate Audio';
       case 'favorites': return 'My Favorites';
@@ -16,7 +17,8 @@ export default function Header({ activeTab, setActiveTab, librarySearch, setLibr
 
   const getTabDesc = () => {
     switch (activeTab) {
-      case 'player': return 'High-quality audio streaming with smart queue management.';
+      case 'player': return 'High-quality audio streaming with time-synchronized captions.';
+      case 'queue': return 'Manage your upcoming audiobook tracks and timing sequences.';
       case 'library': return 'Browse, search, rename, and select generated files stored in Supabase.';
       case 'generate': return 'Convert document text, webpages, or novel chapter sequences.';
       case 'favorites': return 'Your curated list of premium tracks.';

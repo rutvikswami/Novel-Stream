@@ -95,7 +95,7 @@ export default function AudioLibrary({
     <div>
       {/* Top Header Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+        <div className="mobile-hidden" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
           Browse, search, rename, and select generated files stored in Supabase.
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -113,7 +113,7 @@ export default function AudioLibrary({
       {/* Tool Search and Filter Row */}
       <div className="library-tools" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
         {/* Search */}
-        <div className="input-wrapper search-input-wrapper" style={{ flex: 1, maxWidth: '280px' }}>
+        <div className="input-wrapper search-input-wrapper mobile-hidden" style={{ flex: 1, maxWidth: '280px' }}>
           <span className="input-icon"><Search size={14} /></span>
           <input
             type="text"
@@ -127,9 +127,9 @@ export default function AudioLibrary({
         </div>
 
         {/* Category Tabs */}
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="library-category-container" style={{ display: 'flex', gap: '8px' }}>
           <button 
-            className={`btn-icon ${categoryFilter === 'all' ? 'active-toggle' : ''}`}
+            className={`btn-icon library-category-btn ${categoryFilter === 'all' ? 'active-toggle' : ''}`}
             onClick={() => setCategoryFilter('all')}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 12px', width: 'auto', fontSize: '0.8rem', height: '36px', background: categoryFilter === 'all' ? 'rgba(0, 240, 255, 0.08)' : 'transparent', borderColor: categoryFilter === 'all' ? 'var(--neon-cyan)' : 'rgba(255, 255, 255, 0.08)', color: categoryFilter === 'all' ? 'var(--neon-cyan)' : 'var(--text-secondary)' }}
           >
@@ -138,7 +138,7 @@ export default function AudioLibrary({
           </button>
           
           <button 
-            className={`btn-icon ${categoryFilter === 'novel' ? 'active-toggle' : ''}`}
+            className={`btn-icon library-category-btn ${categoryFilter === 'novel' ? 'active-toggle' : ''}`}
             onClick={() => setCategoryFilter('novel')}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 12px', width: 'auto', fontSize: '0.8rem', height: '36px', background: categoryFilter === 'novel' ? 'rgba(0, 240, 255, 0.08)' : 'transparent', borderColor: categoryFilter === 'novel' ? 'var(--neon-cyan)' : 'rgba(255, 255, 255, 0.08)', color: categoryFilter === 'novel' ? 'var(--neon-cyan)' : 'var(--text-secondary)' }}
           >
@@ -147,7 +147,7 @@ export default function AudioLibrary({
           </button>
 
           <button 
-            className={`btn-icon ${categoryFilter === 'conversion' ? 'active-toggle' : ''}`}
+            className={`btn-icon library-category-btn ${categoryFilter === 'conversion' ? 'active-toggle' : ''}`}
             onClick={() => setCategoryFilter('conversion')}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 12px', width: 'auto', fontSize: '0.8rem', height: '36px', background: categoryFilter === 'conversion' ? 'rgba(0, 240, 255, 0.08)' : 'transparent', borderColor: categoryFilter === 'conversion' ? 'var(--neon-cyan)' : 'rgba(255, 255, 255, 0.08)', color: categoryFilter === 'conversion' ? 'var(--neon-cyan)' : 'var(--text-secondary)' }}
           >
@@ -160,9 +160,9 @@ export default function AudioLibrary({
         <button className="btn-icon" title="Filter settings"><SlidersHorizontal size={14} /></button>
 
         {/* Bulk action buttons on the right */}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+        <div className="library-bulk-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
           <button
-            className="btn-bulk-delete"
+            className="btn-bulk-delete library-action-btn"
             onClick={bulkDelete}
             disabled={selectedLibraryFiles.length === 0}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: selectedLibraryFiles.length > 0 ? 'rgba(217, 4, 41, 0.15)' : 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', color: selectedLibraryFiles.length > 0 ? 'var(--neon-red)' : 'var(--text-muted)' }}
@@ -171,7 +171,7 @@ export default function AudioLibrary({
             Bulk Delete
           </button>
           <button
-            className="btn-bulk-fetch"
+            className="btn-bulk-fetch library-action-btn"
             onClick={bulkLoadToPlaylist}
             disabled={selectedLibraryFiles.length === 0}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: selectedLibraryFiles.length > 0 ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.02)', color: selectedLibraryFiles.length > 0 ? '#030712' : 'var(--text-muted)' }}
@@ -230,9 +230,9 @@ export default function AudioLibrary({
                   />
                 </th>
                 <th className="library-th">TITLE</th>
-                <th className="library-th" style={{ width: '100px' }}>DURATION</th>
-                <th className="library-th" style={{ width: '100px' }}>SIZE</th>
-                <th className="library-th" style={{ width: '160px' }}>ADDED ON</th>
+                <th className="library-th mobile-hidden" style={{ width: '100px' }}>DURATION</th>
+                <th className="library-th mobile-hidden" style={{ width: '100px' }}>SIZE</th>
+                <th className="library-th mobile-hidden" style={{ width: '160px' }}>ADDED ON</th>
                 <th className="library-th" style={{ width: '160px' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -280,15 +280,15 @@ export default function AudioLibrary({
                       </div>
                     </td>
                     {/* Duration */}
-                    <td className="library-td" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <td className="library-td mobile-hidden" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                       {getMockDuration(actualIdx)}
                     </td>
                     {/* Size */}
-                    <td className="library-td" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <td className="library-td mobile-hidden" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                       {getMockSize(actualIdx)}
                     </td>
                     {/* Added On */}
-                    <td className="library-td" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <td className="library-td mobile-hidden" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                       {getMockAddedOn(actualIdx)}
                     </td>
                     {/* Actions */}

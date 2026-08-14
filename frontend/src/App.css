@@ -1816,9 +1816,11 @@ input:checked + .slider-round:before {
 
 @media (max-width: 768px) {
   .app-layout {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: 1fr auto !important;
+    display: flex !important;
+    flex-direction: column !important;
     height: 100vh;
+    width: 100vw;
+    overflow: hidden;
   }
 
   .sidebar {
@@ -1827,19 +1829,28 @@ input:checked + .slider-round:before {
 
   .main-view {
     padding: 16px;
-    height: auto;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
     overflow-y: auto !important;
-    padding-bottom: 140px; /* Space for fixed player and nav */
+    padding-bottom: 210px; /* Space for fixed player and nav */
   }
 
   .main-view.player-view {
-    height: auto;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
     overflow-y: auto !important;
   }
 
   .dashboard-grid {
     grid-template-columns: 1fr !important;
     gap: 20px;
+  }
+
+  .main-view.player-view .dashboard-grid {
+    height: auto !important;
+    min-height: 0 !important;
   }
 
   .main-view.player-view .now-playing-card,
@@ -1860,40 +1871,226 @@ input:checked + .slider-round:before {
     bottom: 60px;
     left: 0;
     right: 0;
-    height: 65px;
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(5, 7, 10, 0.95);
+    height: 125px !important;
+    display: grid !important;
+    grid-template-columns: 1.2fr auto 1.2fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 8px 12px !important;
+    background: rgba(5, 7, 10, 0.97) !important;
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--panel-border);
-    padding: 0 16px;
+    padding: 12px 16px 8px !important;
     z-index: 999;
   }
 
-  .player-track-info {
-    flex: 1;
-    min-width: 0;
+  .player-controls-container {
+    display: contents !important; /* Flatten grid layout so timeline can be direct grid child */
   }
 
-  .player-controls-container {
-    flex: 0;
+  .player-timeline-wrapper {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    align-items: center;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .player-timeline-wrapper input[type="range"] {
+    flex: 1 !important;
+  }
+
+  .player-track-info {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+  }
+
+  .player-thumbnail,
+  .player-track-details {
+    display: none !important; /* Hide track name, details, and thumbnail on mobile */
+  }
+
+  .player-track-info .btn-footer-icon {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 24px !important;
+    height: 24px !important;
+    margin-left: 0 !important;
+    color: var(--neon-cyan) !important;
   }
 
   .player-buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .player-timeline-wrapper,
-  .player-btn-circle:not(.player-btn-play),
-  .player-right-controls {
-    display: none !important; /* Hide secondary player features on bottom bar on mobile */
-  }
-
-  .player-btn-play {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
     display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px !important;
+  }
+
+  .player-bar .player-btn-circle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+  }
+
+  .player-bar .player-btn-play {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+  }
+
+  .player-right-controls {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px !important;
+  }
+
+  .player-volume-wrapper {
+    display: none !important; /* Hide volume controls to prevent clutter on mobile */
+  }
+
+  .speed-control-wrapper {
+    display: block !important;
+  }
+
+  .speed-select-btn {
+    padding: 4px 6px !important;
+    font-size: 0.7rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+  }
+
+  /* Hide the list queue toggle button on mobile right side */
+  .player-right-controls .player-btn-circle {
+    display: none !important;
+  }
+
+  /* General mobile utilities */
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  /* Library Top & Table Mobile Tweaks */
+  .library-category-container {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  .library-category-btn {
+    flex: 1 1 calc(50% - 6px) !important;
+    font-size: 0.7rem !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    justify-content: center !important;
+  }
+
+  .library-settings-btn {
+    display: none !important; /* Hide settings icon on mobile to save space */
+  }
+
+  .library-bulk-actions {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 4px !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  .library-action-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+    height: 34px !important;
+  }
+
+  .library-table-container {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .library-td {
+    padding: 10px 8px !important;
+  }
+
+  .library-th {
+    padding: 10px 8px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Generate Audio Mobile Tweaks */
+  .sub-tabs {
+    flex-direction: column !important;
+    gap: 8px !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 16px !important;
+  }
+
+  .sub-tab {
+    width: 100% !important;
+    padding: 8px 12px !important;
+    font-size: 0.75rem !important;
+    justify-content: center !important;
+  }
+
+  .shadow-panel {
+    padding: 16px !important;
+    border-radius: 12px !important;
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem !important;
+  }
+
+  .description-secondary {
+    font-size: 0.7rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .form-group {
+    margin-bottom: 12px !important;
+  }
+
+  .form-label {
+    font-size: 0.7rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .text-input, .textarea-input {
+    font-size: 0.8rem !important;
+    padding: 8px 10px !important;
+  }
+
+  .input-wrapper .input-icon {
+    left: 10px !important;
+  }
+
+  .input-wrapper input {
+    padding-left: 30px !important;
+  }
+
+  .btn-generate {
+    padding: 10px 14px !important;
+    font-size: 0.8rem !important;
   }
 
   /* Mobile bottom tab navigation menu */

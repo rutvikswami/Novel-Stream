@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { createClient } from '@supabase/supabase-js';
-import { Disc, Library, Sparkles } from 'lucide-react';
+import { Disc, Library, Sparkles, ListMusic } from 'lucide-react';
 
 // Subcomponents
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import BottomPlayer from './components/BottomPlayer';
 import NowPlayingQueue from './components/NowPlayingQueue';
+import PlayQueue from './components/PlayQueue';
 import AudioLibrary from './components/AudioLibrary';
 import GenerateAudio from './components/GenerateAudio';
 import FavoritesPlaceholder from './components/FavoritesPlaceholder';
@@ -1250,6 +1251,26 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'queue' && (
+          <PlayQueue
+            playlist={playlist}
+            setPlaylist={setPlaylist}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
+            draggedIndex={draggedIndex}
+            setDraggedIndex={setDraggedIndex}
+            dragOverIndex={dragOverIndex}
+            setDragOverIndex={setDragOverIndex}
+            handleDragStart={handleDragStart}
+            handleDragOver={handleDragOver}
+            handleDragEnd={handleDragEnd}
+            handleDrop={handleDrop}
+            loadTrack={loadTrack}
+            autoplayEnabled={autoplayEnabled}
+            setAutoplayEnabled={setAutoplayEnabled}
+          />
+        )}
+
         {activeTab === 'library' && (
           <AudioLibrary
             library={library}
@@ -1362,6 +1383,10 @@ export default function App() {
         <button className={`mobile-nav-item ${activeTab === 'player' ? 'active' : ''}`} onClick={() => setActiveTab('player')}>
           <Disc size={20} />
           <span>Player</span>
+        </button>
+        <button className={`mobile-nav-item ${activeTab === 'queue' ? 'active' : ''}`} onClick={() => setActiveTab('queue')}>
+          <ListMusic size={20} />
+          <span>Queue</span>
         </button>
         <button className={`mobile-nav-item ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>
           <Library size={20} />

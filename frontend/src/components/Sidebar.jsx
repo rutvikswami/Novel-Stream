@@ -9,7 +9,8 @@ import {
   Clock,
   Check,
   Crown,
-  Database
+  Database,
+  ListMusic
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, playlistCount, storageInfo }) {
@@ -28,7 +29,15 @@ export default function Sidebar({ activeTab, setActiveTab, playlistCount, storag
           onClick={() => setActiveTab('player')}
         >
           <Disc size={18} />
-          <span>Now Playing & Queue</span>
+          <span>Now Playing</span>
+        </button>
+        <button 
+          className={`nav-item ${activeTab === 'queue' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('queue')}
+        >
+          <ListMusic size={18} />
+          <span>Play Queue</span>
+          {playlistCount > 0 && <span className="nav-item-count">{playlistCount}</span>}
         </button>
         <button 
           className={`nav-item ${activeTab === 'library' ? 'active' : ''}`} 
