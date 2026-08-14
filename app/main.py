@@ -17,7 +17,13 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8000",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,8 +31,7 @@ app.add_middleware(
 
 templates = Jinja2Templates(directory="templates")
 
-if os.path.exists("frontend/dist"):
-    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+# Assets mount handled at root level at bottom of file
 
 
 class DeleteFilesRequest(BaseModel):
@@ -83,6 +88,8 @@ async def get_job(job_id: str):
 
 @app.get("/")
 async def player(request: Request):
+    if os.path.exists("frontend/dist/index.html"):
+        return FileResponse("frontend/dist/index.html")
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -507,4 +514,8 @@ async def upload_file(file: UploadFile = File(...)):
     except Exception as e:
         print("Error uploading file:", e)
         return {"error": str(e)}
+
+# Mount static files at root level at the end so it serves assets, favicon, etc.
+if os.path.exists("frontend/dist"):
+    app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="dist")
 

@@ -17,12 +17,13 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = (supabaseUrl && supabaseAnonKey) ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 
-// Bulletproof API URL resolution for local React development
+// Bulletproof API URL resolution for local React development & Vercel
 const getApiBase = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
-  if (window.location.port === '5173') {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
+  if (isLocal) {
     return 'http://localhost:8000';
   }
   return window.location.origin;
