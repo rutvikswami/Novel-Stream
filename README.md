@@ -586,7 +586,7 @@ Connect GitHub repository.
 # Build Command
 
 ```bash
-pip install -r requirements.txt
+./build.sh
 ```
 
 ---
