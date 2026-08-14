@@ -11,3 +11,4 @@ playwright
 nodriver
 pypdf
 python-docx
+python-multipart
