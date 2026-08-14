@@ -1,5 +1,4 @@
-from fastapi import FastAPI, Request, UploadFile, File
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -29,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-templates = Jinja2Templates(directory="templates")
+
 
 # Assets mount handled at root level at bottom of file
 
@@ -87,16 +86,10 @@ async def get_job(job_id: str):
 
 
 @app.get("/")
-async def player(request: Request):
+async def player():
     if os.path.exists("frontend/dist/index.html"):
         return FileResponse("frontend/dist/index.html")
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request
-        }
-    )
+    return {"message": "Frontend build not found. Please build the frontend."}
 
 @app.post("/pause-job/{job_id}")
 async def pause_job(job_id: str):
